@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import { VERIFICATION_EMAIL_TEMPLATE, WELCOME_TEMPLATE } from "./emailTemplates.js";
+import { PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, WELCOME_TEMPLATE } from "./emailTemplates.js";
 dotenv.config();
 
 // Create a transporter object using Gmail's SMTP settings
@@ -57,3 +57,39 @@ export const sendWelcomeEmail = async (email, name) => {
         throw new Error(`Error sending welcome email: ${error}`);
     }
 };
+
+export const sendPasswordResetEmail = async(email, resetURL) =>{
+    const recipient = [email]; // Directly use the email string
+
+    try {
+        const response = await transporter.sendMail({
+            from: sender,
+            to: recipient,
+            subject: "Reset Your Password",
+            html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}",resetURL),
+        });
+
+        console.log('Password reset email sent successfully', response);
+    } catch (error) {
+        console.error('Error sending password reset email', error);
+        throw new Error(`Error sending password reset email: ${error}`);
+    }
+}
+
+export const sendResetSuccessEmail = async(email)=>{
+    const recipient = [email]; // Directly use the email string
+
+    try {
+        const response = await transporter.sendMail({
+            from: sender,
+            to: recipient,
+            subject: "Password Reset Successful",
+            html: PASSWORD_RESET_SUCCESS_TEMPLATE
+        });
+
+        console.log('Password reset email sent successfully', response);
+    } catch (error) {
+        console.error('Error sending password reset email', error);
+        throw new Error(`Error sending password reset email: ${error}`);
+    }
+}
